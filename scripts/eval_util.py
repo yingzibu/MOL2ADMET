@@ -1,15 +1,15 @@
 from mycolorpy import colorlist as mcp
 import matplotlib.pyplot as plt
 import sklearn.metrics as metrics
+import rdkit
+
 from rdkit import Chem
 from rdkit.Chem.SaltRemover import SaltRemover
+from rdkit.Chem.MACCSkeys import GenMACCSKeys
+
 import pandas as pd
 import numpy as np
 from tqdm import tqdm
-
-MASK = -100
-
-
 from molvs.normalize import Normalizer, Normalization
 from molvs.charge import Reionizer, Uncharger
 import torch.nn as nn
@@ -17,13 +17,32 @@ import torch.nn as nn
 from tdc.single_pred import ADME
 from rdkit import RDLogger
 import warnings
-RDLogger.DisableLog('rdApp.*')
-warnings.filterwarnings("ignore")
-
 from sklearn.metrics import confusion_matrix, roc_auc_score
 from sklearn.metrics import f1_score, accuracy_score, average_precision_score
 
 import math
+
+from torch.utils.data import DataLoader, Dataset
+import torch.nn.functional as F
+
+RDLogger.DisableLog('rdApp.*')
+warnings.filterwarnings("ignore")
+
+MASK = -100
+
+
+
+
+
+m = Chem.MolFromSmiles
+header = ['bit' + str(i) for i in range(167)]
+
+def smile_list_to_MACCS(smi_list:list):
+    MACCS_list = []
+    for smi in smi_list:
+        maccs = [float(i) for i in list(GenMACCSKeys(m(smi)).ToBitString())]
+        MACCS_list.append(maccs)
+    return MACCS_list
 
 def get_preds(threshold, probabilities):
     try:
