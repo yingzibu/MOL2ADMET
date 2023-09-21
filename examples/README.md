@@ -8,6 +8,16 @@ Single Objective (SO) MLP (MACCS Fingerprint):
 
 https://colab.research.google.com/drive/1V-LOuUzMYAAuzwtgCEHJXLXNuG9MUtFZ#scrollTo=MPQ0uReno9wI&uniqifier=1
 
+
+    dims = [167, [128, 64, 32, 16], 1]
+    ----------------------------------------------------------------
+            Layer (type)               Output Shape         Param #
+    ================================================================
+                Linear-1              [-1, 64, 128]          21,504
+                Linear-2               [-1, 64, 64]           8,256
+                Linear-3               [-1, 64, 32]           2,080
+                Linear-4               [-1, 64, 16]             528
+                Linear-5                [-1, 64, 1]              17
     ================================================================
     Total params: 32,385
     Trainable params: 32,385
