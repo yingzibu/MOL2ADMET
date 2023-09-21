@@ -1,6 +1,5 @@
 ### Leaderboard
 
-leaderboard 
 
 https://tdcommons.ai/benchmark/admet_group/overview/
 
