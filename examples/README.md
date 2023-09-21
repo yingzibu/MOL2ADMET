@@ -29,3 +29,5 @@ https://colab.research.google.com/drive/1V-LOuUzMYAAuzwtgCEHJXLXNuG9MUtFZ#scroll
      {'cyp3a4_veith': [0.801, 0.003]},
      {'cyp2c9_veith': [0.672, 0.006]}]
      {'ames': [0.783, 0.011]}
+     {'ld50_zhu': [0.665, 0.019]},
+     {'herg': [0.778, 0.016]}]
