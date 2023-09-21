@@ -9,7 +9,6 @@ from tqdm import tqdm
 
 MASK = -100
 
-"Reference: https://github.com/Yimeng-Wang/JAK-MTATFP/blob/main/preprocess.py"
 
 from molvs.normalize import Normalizer, Normalization
 from molvs.charge import Reionizer, Uncharger
@@ -78,7 +77,7 @@ def evaluate(y_real, y_hat, y_prob):
     return ACCURACY, weighted_accuracy, precision, SE, SP, F1, AUC, MCC, AP
 
 
-def preprocess(smi):
+def preprocess(smi): "Reference: https://github.com/Yimeng-Wang/JAK-MTATFP/blob/main/preprocess.py"
     mol = Chem.MolFromSmiles(smi)
     normalizer = Normalizer()
     new1 = normalizer.normalize(mol)
