@@ -10,3 +10,8 @@ colab file: https://colab.research.google.com/drive/1OSdSm5Nlv5qq_1_ZXLuRdAyeVBF
 tut-6_transformer.pt: transformer AE model
 
 colab file: https://colab.research.google.com/drive/1mH2_MK9RpxwEWrq23CRImniekwiVFJdW#scrollTo=mwQMJyM1KbGx
+
+
+ckpt_M.pt: AttentiveFP, for 5 metabolism binary classification task
+
+check examples/AttentiveFP_NN_ADME.ipynb
