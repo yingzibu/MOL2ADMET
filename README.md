@@ -1,1 +1,2 @@
-# MOL2AE
+# Mol -> AE
+# Mol -> ADMET
