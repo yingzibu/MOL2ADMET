@@ -1,4 +1,6 @@
 ### Run time comparison
+
+[runtime code](ADMET_10_24_runtime.ipynb)
 ```
 5 tasks maximum on metabolism, runtime comparison
 
