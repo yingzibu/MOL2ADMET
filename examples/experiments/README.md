@@ -11,5 +11,5 @@ stacked graphs: https://drive.google.com/drive/folders/1HPZ4JstMSGOngm8c7AMnpwpa
 
  | dim reduction | data
 :-----:|:-------------------------: 
-|regression example| ![](CYP1A2_Veith_PCA_TSNE.png)   
+|regression example| ![](Lipophilicity_AstraZeneca_PCA_TSNE.png)   
 | classification example | ![](CYP1A2_Veith_PCA_TSNE.png)   
