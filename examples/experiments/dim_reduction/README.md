@@ -10,7 +10,7 @@ t-SNE: https://drive.google.com/drive/folders/18sOg3IbdnczgCi7t8M-3if-ag5JShAvC?
 stacked graphs: https://drive.google.com/drive/folders/1HPZ4JstMSGOngm8c7AMnpwpapxUIpvMA?usp=drive_link
 
 
- | dim reduction | data
+ | dimension reduction | data visualization
 :-----:|:-------------------------: 
 |regression example| ![](Lipophilicity_AstraZeneca_PCA_TSNE.png)   
 | classification example | ![](CYP1A2_Veith_PCA_TSNE.png)   
