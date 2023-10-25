@@ -5,13 +5,12 @@
 5 tasks maximum on metabolism, runtime (ms) comparison
 
 MLP:
-$$
 	1: 0.166 $\pm$ 0.005
 	2: 0.176 $\pm$ 0.006
 	3: 0.181 $\pm$ 0.005
 	4: 0.186 $\pm$ 0.005
 	5: 0.193 $\pm$ 0.004
-$$
+
 Attentive FP:
 	1: 0.340 $\pm$ 0.007
 	2: 0.347 $\pm$ 0.009
