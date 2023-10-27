@@ -8,6 +8,8 @@ PCA:   https://drive.google.com/drive/folders/1DS8ruwNYeb-GF3_bVxd6-HSL028XEKu7?
 
 t-SNE: https://drive.google.com/drive/folders/18sOg3IbdnczgCi7t8M-3if-ag5JShAvC?usp=drive_link
 
+Tanimoto: https://drive.google.com/drive/folders/13ln0pIhHSSOY_9oLf2LL3HvFX10hAeMH?usp=drive_link
+
 stacked graphs: https://drive.google.com/drive/folders/1HPZ4JstMSGOngm8c7AMnpwpapxUIpvMA?usp=drive_link
 
 
@@ -15,3 +17,4 @@ stacked graphs: https://drive.google.com/drive/folders/1HPZ4JstMSGOngm8c7AMnpwpa
 :-----:|:-------------------------: 
 |regression example| ![](Lipophilicity_AstraZeneca_PCA_TSNE.png)   
 | classification example | ![](CYP1A2_Veith_PCA_TSNE.png)   
+
