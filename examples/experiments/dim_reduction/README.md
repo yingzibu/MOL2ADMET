@@ -1,4 +1,4 @@
-## PCA, t-SNE 
+## PCA, t-SNE, Tanimoto 
 
 #### NOT PUBLIC AVAILABLE
 
