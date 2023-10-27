@@ -2,27 +2,21 @@ from mycolorpy import colorlist as mcp
 import matplotlib.pyplot as plt
 import sklearn.metrics as metrics
 import rdkit
-
 from rdkit import Chem
-from rdkit.Chem.SaltRemover import SaltRemover
 from rdkit.Chem.MACCSkeys import GenMACCSKeys
 
 import pandas as pd
 import numpy as np
 from tqdm import tqdm
-from molvs.normalize import Normalizer, Normalization
 from molvs.charge import Reionizer, Uncharger
 import torch.nn as nn
-
-from tdc.single_pred import ADME
 from rdkit import RDLogger
 import warnings
 from sklearn.metrics import confusion_matrix, roc_auc_score
 from sklearn.metrics import f1_score, accuracy_score, average_precision_score
+import sklearn.metrics as metrics
 
 import math
-
-from torch.utils.data import DataLoader, Dataset
 import torch.nn.functional as F
 
 RDLogger.DisableLog('rdApp.*')
@@ -30,19 +24,9 @@ warnings.filterwarnings("ignore")
 
 MASK = -100
 
-
-
-
-
 m = Chem.MolFromSmiles
 header = ['bit' + str(i) for i in range(167)]
 
-def smile_list_to_MACCS(smi_list:list):
-    MACCS_list = []
-    for smi in smi_list:
-        maccs = [float(i) for i in list(GenMACCSKeys(m(smi)).ToBitString())]
-        MACCS_list.append(maccs)
-    return MACCS_list
 
 def get_preds(threshold, probabilities):
     try:
@@ -96,18 +80,6 @@ def evaluate(y_real, y_hat, y_prob):
     return ACCURACY, weighted_accuracy, precision, SE, SP, F1, AUC, MCC, AP
 
 
-def preprocess(smi): "Reference: https://github.com/Yimeng-Wang/JAK-MTATFP/blob/main/preprocess.py"
-    mol = Chem.MolFromSmiles(smi)
-    normalizer = Normalizer()
-    new1 = normalizer.normalize(mol)
-    remover = SaltRemover()
-    new2 = remover(new1)
-    neutralize1 = Reionizer()
-    new3 = neutralize1(new2)
-    neutralize2 = Uncharger()
-    new4 = neutralize2(new3)
-    new_smiles = Chem.MolToSmiles(new4, kekuleSmiles=False)
-    return new_smiles
 
 def reg_evaluate(label_clean, preds_clean):
     mae = metrics.mean_absolute_error(label_clean, preds_clean)
@@ -115,13 +87,9 @@ def reg_evaluate(label_clean, preds_clean):
     rmse = np.sqrt(mse) #mse**(0.5)
     r2 = metrics.r2_score(label_clean, preds_clean)
 
-    # print("Overall results of sklearn.metrics:")
-    # print("MAE:",mae)
-    # print("MSE:", mse)
-    # print("RMSE:", rmse)
-    # print("R-Squared:", r2)
-    print('MAE     RMSE     R2')
-    print("& %5.3f" % (mae), " & %3.3f" % (rmse), " & %3.3f" % (r2))
+    print('  MAE     MSE     RMSE    R2')
+    print("&%5.3f" % (mae), " &%5.3f" % (mse), " &%5.3f" % (rmse),
+      " &%5.3f" % (r2))
 
     eval_result_r2 =   f'R2:     {r2:.3f}'
     eval_result_mae =  f'MAE:   {mae:.3f}'
@@ -129,26 +97,56 @@ def reg_evaluate(label_clean, preds_clean):
 
     return eval_result_r2, eval_result_mae, eval_result_rmse
 
-def rename_cols(df, name): return df.rename(columns={'Y':name})
+from mycolorpy import colorlist as mcp
+import matplotlib.pyplot as plt
 
-def clean_mol(df:pd.DataFrame):
-    prev_len = len(df)
-    for i in tqdm(range(len(df)), total=len(df), desc='Cleaning mols'):
-        try: df.iloc[i]['Drug'] = preprocess(df.iloc[i]['Drug'])
-        except: df.drop(i)
-    if len(df) != prev_len: print(f'prev len: {prev_len}; after clean: {len(df)}')
-    return df.reset_index(drop=True)
+def eval_dict(y_probs:dict, y_label:dict, names:list, IS_R, draw_fig=False):
+    if isinstance(IS_R, list): task_list = IS_R
+    else: task_list = [IS_R] * len(names)
+    for i, (name, IS_R) in enumerate(zip(names, task_list)):
+        # IS_R = task_list[i]
+        print('*'*15, name, '*'*15)
+        # print('Regression task', IS_R)
 
-def scal(df): # min max scaling
-    # df_norm = df.loc[:, df.columns!='Drug'].copy()
-    df_norm = df.copy()
-    for col in df_norm.columns:
-        if col == 'Drug': pass
-        else:
-            df_norm[col] = (df_norm[col]-df_norm[col].min()
-                )/(df_norm[col].max()-df_norm[col].min()) * 10
-    # df_norm['Drug'] = df['Drug']
-    return df_norm
+        probs = y_probs[name]
+        label = y_label[name]
+        assert len(probs) == len(label)
+        if IS_R == False: # classification task
+            preds = get_preds(0.5, probs)
+            evaluate(label, preds, probs)
+
+        else: # regression task
+            r2, mae, rmse = reg_evaluate(label, probs)
+            if draw_fig:
+                color = mcp.gen_color_normalized(cmap='viridis',
+                                                data_arr=label)
+                plt.scatter(label, probs, cmap='viridis', marker='.',
+                            s=10, alpha=0.5, edgecolors='none', c=color)
+                plt.xlabel(f'True {name}')
+                plt.ylabel(f'Predicted {name}')
+                plt.title(f'{name} prediction on test set')
+
+                x0, xmax = plt.xlim()
+                y0, ymax = plt.ylim()
+                data_width = xmax - x0
+                data_height = ymax - y0
+                # print(x0, xmax, y0, ymax, data_width, data_height)
+                plt.text(x0 + 0.1*data_width, y0 + data_height * 0.8/0.95, r2)
+                plt.text(x0 + 0.1*data_width, y0 + data_height * 0.8,  mae)
+                plt.text(x0 + 0.1*data_width, y0 + data_height * 0.8*0.95, rmse)
+
+                plt.show()
+                plt.cla()
+                plt.clf()
+                plt.close()
+        print()
+
+# # TEST Classification
+# b = evaluate([1, 0, 1], [1, 1, 1], [1, 0.6, 1])
+# print(b[0])
+
+# # TEST Regression
+# reg_evaluate([2.3, 2.1], [3, 2])
 
 
 def get_min(d:dict):
