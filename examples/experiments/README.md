@@ -26,3 +26,27 @@ GIN:
 	5: 2.473 $\pm$ 0.031
 
 ```
+
+### Model parameter comparison
+```
+MLP
+	 1: 30817 parameters
+	 2: 30834 parameters
+	 3: 30851 parameters
+	 4: 30868 parameters
+	 5: 30885 parameters
+
+AttentiveFP
+	 1: 3823507 parameters
+	 2: 3823808 parameters
+	 3: 3824109 parameters
+	 4: 3824410 parameters
+	 5: 3824711 parameters
+
+GIN
+	 1: 1977165 parameters
+	 2: 1977182 parameters
+	 3: 1977199 parameters
+	 4: 1977216 parameters
+	 5: 1977233 parameters
+```
