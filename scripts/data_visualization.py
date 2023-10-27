@@ -2,6 +2,7 @@
 Date: 10.26.2023
 Purpose: PCA, t-SNE, Tanimoto Similarity
 """
+
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -15,8 +16,7 @@ from sklearn.manifold import TSNE
 from sklearn.preprocessing import MinMaxScaler
 from rdkit import Chem
 from tqdm import tqdm
-from molvs.normalize import Normalizer, Normalization
-from molvs.charge import Reionizer, Uncharger
+
 import rdkit
 from rdkit.Chem.MACCSkeys import GenMACCSKeys
 from rdkit import RDLogger
@@ -26,7 +26,6 @@ from rdkit.Chem import MACCSkeys
 
 RDLogger.DisableLog('rdApp.*')
 warnings.filterwarnings("ignore")
-
 
 m = Chem.MolFromSmiles
 header = ['bit' + str(i) for i in range(167)]
