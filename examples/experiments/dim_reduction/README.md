@@ -17,4 +17,4 @@ stacked graphs: https://drive.google.com/drive/folders/1HPZ4JstMSGOngm8c7AMnpwpa
 :-----:|:-------------------------: 
 |regression example| ![](Lipophilicity_AstraZeneca_PCA_TSNE.png)   
 | classification example | ![](CYP1A2_Veith_PCA_TSNE.png)   
-
+|Tanimoto similarity| ![](hERG_Karim_Tanimoto.png)
