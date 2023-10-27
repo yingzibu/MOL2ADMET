@@ -1,6 +1,142 @@
+[runtime code](ADMET_10_24_runtime.ipynb)
+
+### Model initialization
+
+	in_dim = 256
+	hid_dims = [128, 64, 16]
+	dropout = 0.1
+	lr = 5e-4
+	wd = 1e-5
+	patience = 5 # stop if loss no decrease after epochs # patience
+	batch_size = 128
+	# special for AttentiveFP
+	graph_feat_size = 300
+	n_layers = 5
+	num_timesteps = 1 # times of updating the graph representations with GRU
+	
+	# special for GIN: pretrain model types for selection:
+	pre_models_GIN = ['gin_supervised_contextpred', 'gin_supervised_infomax',
+	                     'gin_supervised_edgepred', 'gin_supervised_masking']
+	model_num = 3 # choose from pre_models for GIN
+	dict_scale = None
+ 
+
+### Model Architecture
+
+#### model type:  MLP
+	Classifier(
+	  (hidden): ModuleList(
+	    (0): Linear(in_features=167, out_features=128, bias=True)
+	    (1): Linear(in_features=128, out_features=64, bias=True)
+	    (2): Linear(in_features=64, out_features=16, bias=True)
+	  )
+	  (final): Linear(in_features=16, out_features=5, bias=True)
+	  (dropout): Dropout(p=0.1, inplace=False)
+	)
+ 
+#### model type:  AttentiveFP
+	AttentiveFPPredictor(
+	  (gnn): AttentiveFPGNN(
+	    (init_context): GetContext(
+	      (project_node): Sequential(
+	        (0): Linear(in_features=39, out_features=300, bias=True)
+	        (1): LeakyReLU(negative_slope=0.01)
+	      )
+	      (project_edge1): Sequential(
+	        (0): Linear(in_features=49, out_features=300, bias=True)
+	        (1): LeakyReLU(negative_slope=0.01)
+	      )
+	      (project_edge2): Sequential(
+	        (0): Dropout(p=0.1, inplace=False)
+	        (1): Linear(in_features=600, out_features=1, bias=True)
+	        (2): LeakyReLU(negative_slope=0.01)
+	      )
+	      (attentive_gru): AttentiveGRU1(
+	        (edge_transform): Sequential(
+	          (0): Dropout(p=0.1, inplace=False)
+	          (1): Linear(in_features=300, out_features=300, bias=True)
+	        )
+	        (gru): GRUCell(300, 300)
+	      )
+	    )
+	    (gnn_layers): ModuleList(
+	      (0-3): 4 x GNNLayer(
+	        (project_edge): Sequential(
+	          (0): Dropout(p=0.1, inplace=False)
+	          (1): Linear(in_features=600, out_features=1, bias=True)
+	          (2): LeakyReLU(negative_slope=0.01)
+	        )
+	        (attentive_gru): AttentiveGRU2(
+	          (project_node): Sequential(
+	            (0): Dropout(p=0.1, inplace=False)
+	            (1): Linear(in_features=300, out_features=300, bias=True)
+	          )
+	          (gru): GRUCell(300, 300)
+	        )
+	      )
+	    )
+	  )
+	  (readout): AttentiveFPReadout(
+	    (readouts): ModuleList(
+	      (0): GlobalPool(
+	        (compute_logits): Sequential(
+	          (0): Linear(in_features=600, out_features=1, bias=True)
+	          (1): LeakyReLU(negative_slope=0.01)
+	        )
+	        (project_nodes): Sequential(
+	          (0): Dropout(p=0.1, inplace=False)
+	          (1): Linear(in_features=300, out_features=300, bias=True)
+	        )
+	        (gru): GRUCell(300, 300)
+	      )
+	    )
+	  )
+	  (predict): Sequential(
+	    (0): Dropout(p=0.1, inplace=False)
+	    (1): Linear(in_features=300, out_features=5, bias=True)
+	  )
+	)
+
+
+#### model type:  GIN
+	Downloading gin_supervised_masking_pre_trained.pth from https://data.dgl.ai/dgllife/pre_trained/gin_supervised_masking.pth...
+	Pretrained model loaded
+	GIN_MOD(
+	  (gnn): GIN(
+	    (dropout): Dropout(p=0.5, inplace=False)
+	    (node_embeddings): ModuleList(
+	      (0): Embedding(120, 300)
+	      (1): Embedding(3, 300)
+	    )
+	    (gnn_layers): ModuleList(
+	      (0-4): 5 x GINLayer(
+	        (mlp): Sequential(
+	          (0): Linear(in_features=300, out_features=600, bias=True)
+	          (1): ReLU()
+	          (2): Linear(in_features=600, out_features=300, bias=True)
+	        )
+	        (edge_embeddings): ModuleList(
+	          (0): Embedding(6, 300)
+	          (1): Embedding(3, 300)
+	        )
+	        (bn): BatchNorm1d(300, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+	      )
+	    )
+	  )
+	  (readout): AvgPooling()
+	  (transform): Linear(in_features=300, out_features=256, bias=True)
+	  (dropout): Dropout(p=0.1, inplace=False)
+	  (hidden): ModuleList(
+	    (0): Linear(in_features=256, out_features=128, bias=True)
+	    (1): Linear(in_features=128, out_features=64, bias=True)
+	    (2): Linear(in_features=64, out_features=16, bias=True)
+	  )
+	  (final): Linear(in_features=16, out_features=5, bias=True)
+	)
+
+
 ### Run time comparison
 
-[runtime code](ADMET_10_24_runtime.ipynb)
 ```
 5 tasks maximum on metabolism, runtime (ms) comparison
 
