@@ -9,6 +9,7 @@
 	wd = 1e-5
 	patience = 5 # stop if loss no decrease after epochs # patience
 	batch_size = 128
+ 	dict_scale = None
 	# special for AttentiveFP
 	graph_feat_size = 300
 	n_layers = 5
@@ -18,9 +19,13 @@
 	pre_models_GIN = ['gin_supervised_contextpred', 'gin_supervised_infomax',
 	                     'gin_supervised_edgepred', 'gin_supervised_masking']
 	model_num = 3 # choose from pre_models for GIN
-	dict_scale = None
  
-
+ 	# special for RNN: 
+	vocab = vocab
+	Bid = True
+	GRU_num_layers = 3
+	GRU_dim = 256
+	
 ### Model Architecture
 
 #### model type:  MLP
