@@ -58,7 +58,13 @@ def AttentiveFP(**config):
             config['graph_feat_size'], config['num_timesteps'], config['dropout'])
 
 # https://lifesci.dgl.ai/_modules/dgllife/model/pretrain.html
-
+from dgllife.model import load_pretrained
+from dgl.nn.pytorch.glob import AvgPooling
+import torch.nn as nn
+from torch.utils.data import Dataset, DataLoader
+from functools import partial
+import torch
+from dgllife.utils import smiles_to_bigraph, PretrainAtomFeaturizer, PretrainBondFeaturizer
 
 class GIN_MOD(nn.Module):
     """
