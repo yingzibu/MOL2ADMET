@@ -43,7 +43,7 @@
 | task type | train | valid
 :-----:|:-------------------------:|:--------------------: 
 |regression example| ![](train_lipo_st.png)| ![](valid_lipo_st.png) |   
-| classification example | ![](valid_lipo_st.png)  | ![](valid_lipo_st.png)   
+| classification example | ![](cyp2d6_train.png)  | ![](cyp2d6_valid.png)   
 
 
 ## Scale affects regression? 
