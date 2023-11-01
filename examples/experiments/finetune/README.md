@@ -18,7 +18,8 @@
 * write introduction
 
 ···
-	name = 'Lipophilicity_AstraZeneca'
+	
+ 	name = 'Lipophilicity_AstraZeneca'
 	results_dict = {
 	    'MLP':['scale', 6], 
 	    'AttentiveFP': ['scale', 1],
@@ -37,6 +38,32 @@
 	from scripts.func_utils import *
 	plot_performance(valid_dict_list, model_types, title=f'Valid loss during training on {name} regression (ST)')
 	plot_performance(train_dict_list, model_types, title=f'Train loss during training on {name} regression (ST)')
+
+	from scripts.CONSTANT import *
+	name = 'CYP2D6_Veith'
+	folder_name = f'cls/{name}'
+	valid_dict_list, train_dict_list = [], []
+	
+	for model_type in model_types:
+	    print('*'*30, model_type, '*'*30)
+	    perfs, t_l, v_l = [], [], []
+	    for i in range(3):
+	        f = f'{folder_name}/{model_type}_ST_{i}.yml'
+	        with open(f, 'r') as d_: data = yaml.safe_load(d_)
+	        p = data['performance']
+	        t_l.append(data['train_dict'])
+	        v_l.append(data['valid_dict'])
+	        eval_perf_list(p, name, {})
+	        perfs.append(p)
+	    best_idx = eval_perf_list(perfs, name, d)
+	    print('\n\n')
+	    train_dict_list.append(t_l[best_idx])
+	    valid_dict_list.append(v_l[best_idx])
+	
+	from scripts.func_utils import *
+	plot_performance(valid_dict_list, model_types, title=f'Valid loss during training on {name} classification (ST)')
+	plot_performance(train_dict_list, model_types, title=f'Train loss during training on {name} classification (ST)')
+
 ···
 ## Loss drop during training, single task
 
