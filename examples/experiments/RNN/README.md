@@ -5,17 +5,17 @@
 
 #### SMILES result
 ```
-    from scripts.yaml_utils import *
+from scripts.yaml_utils import *
 
-    model_type = 'RNN'
-    for name in names_cls:
-        try: 
-            yml_names = [f'cls/{name}/{model_type}_ST_{i}.yml' for i in range(3)]
-            ps = [yml_report(f, ver=False) for f in yml_names]
-            eval_perf_list(ps, name, {})
-    
-        except: 
-            print('cannot handle ', name)
+model_type = 'RNN'
+for name in names_cls:
+try: 
+    yml_names = [f'cls/{name}/{model_type}_ST_{i}.yml' for i in range(3)]
+    ps = [yml_report(f, ver=False) for f in yml_names]
+    eval_perf_list(ps, name, {})
+
+except: 
+    print('cannot handle ', name)
 ```
 
 ```
