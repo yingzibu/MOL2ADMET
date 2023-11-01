@@ -15,7 +15,15 @@
 
 ### Ongoing work
 * VAE implementation
-* write introduction 
+* write introduction
+
+
+## Loss drop during training, single task
+
+| task type | train | valid
+:-----:|:-------------------------:|:--------------------: 
+|regression example| ![](train_lipo_st.png)| ![](valid_lipo_st.png) |   
+| classification example | ![](valid_lipo_st.png)  | ![](valid_lipo_st.png)   
 
 
 ## Scale affects regression? 
