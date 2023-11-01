@@ -14,6 +14,9 @@
 *     
 
 ### Ongoing work
+
+https://colab.research.google.com/drive/1pYgrZ8beRZtljh3M9q6KpeId8itfGuRl#scrollTo=q4I-e9vbUbUJ&uniqifier=1
+
 * VAE implementation
 * write introduction
 
