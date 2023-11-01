@@ -18,7 +18,7 @@
 * write introduction 
 
 
-#### Scale affects regression? 
+## Scale affects regression? 
 
 https://colab.research.google.com/drive/1pYgrZ8beRZtljh3M9q6KpeId8itfGuRl#scrollTo=3oGnffnu4Zkn&uniqifier=1
 
