@@ -8,64 +8,69 @@ from tdc import Evaluator
 
 from mycolorpy import colorlist as mcp
 import matplotlib.pyplot as plt
-
+from scripts.func_utils import make_path
 
 evaluate_names = ['ROC-AUC', 'PR-AUC']
 
 def get_preds(threshold, probabilities):
-    try:
+    try: 
         if probabilities.shape[1] == 2: probabilities = probabilities[:, 1]
     except: pass
     return [1 if prob > threshold else 0 for prob in probabilities]
 
-def evaluate_model(TP, FP, TN, FN):
+# def evaluate_model(TP, FP, TN, FN):
 
-    ACCURACY = (TP + TN) / (TP+FP+TN+FN)
-    SE = TP/(TP+FN)
-    recall = SE
-    SP = TN/(TN+FP)
+#     ACCURACY = (TP + TN) / (TP + FP + TN + FN)
+#     SE = TP / (TP + FN); recall = SE; SP = TN / (TN + FP)
+#     weighted_accuracy = (SE + SP) / 2
+#     precision = TP / (TP + FP); SP = TN / (TN + FP)
+#     F1 = 2 * precision * recall /(precision + recall)
+
+#     temp = (TP + FP) * (TP + FN) * (TN + FP) * (TN + FN)
+#     if temp != 0: MCC = (TP * TN - FP * FN) * 1.0 / (math.sqrt(temp))
+#     else:
+#         print('MCC=(TP*TN-FP*FN)*1.0/(math.sqrt(temp)), temp=0, cannot cal MCC')
+#         print('TP, FP, TN, FN', TP, FP, TN, FN); MCC = 'N/A'
+
+#     return ACCURACY,SE, SP, weighted_accuracy, precision, F1, MCC
+
+def evaluate(y_real, y_hat, y_prob): # for classification 
+    TN, FP, FN, TP = confusion_matrix(y_real, y_hat).ravel()
+    # ACCURACY,SE, SP, weighted_accuracy, precision, F1, \
+    #     MCC  = evaluate_model(TP, FP, TN, FN)
+    ACCURACY = (TP + TN) / (TP + FP + TN + FN)
+    SE = TP / (TP + FN); recall = SE; SP = TN / (TN + FP)
     weighted_accuracy = (SE + SP) / 2
-
-    precision = TP / (TP + FP)
-    SP = TN/(TN+FP)
+    precision = TP / (TP + FP); SP = TN / (TN + FP)
     F1 = 2 * precision * recall /(precision + recall)
 
-    temp = (TP+FP)*(TP+FN)*(TN+FP)*(TN+FN)
-    if temp != 0:
-        MCC = (TP*TN-FP*FN)*1.0/(math.sqrt(temp))
+    temp = (TP + FP) * (TP + FN) * (TN + FP) * (TN + FN)
+    if temp != 0: MCC = (TP * TN - FP * FN) * 1.0 / (math.sqrt(temp))
     else:
-        print('equation for MCC is (TP*TN-FP*FN)*1.0/(math.sqrt(temp))')
-        print('TP, FP, TN, FN', TP, FP, TN, FN)
-        print('temp=0')
-        MCC = 'N/A'
-
-    return ACCURACY,SE, SP, weighted_accuracy, precision, F1, MCC
-
-def evaluate(y_real, y_hat, y_prob):
-    TN, FP, FN, TP = confusion_matrix(y_real, y_hat).ravel()
-    ACCURACY,SE, SP, weighted_accuracy, precision, F1, \
-        MCC  = evaluate_model(TP, FP, TN, FN)
+        print('at least 2 of TP, FP, TN, FN are 0, cannot cal MCC, set as -100')
+        print('TP, FP, TN, FN', TP, FP, TN, FN); MCC = -100
     try:
         if y_prob.shape[1] == 2: proba = y_prob[:, 1]
         else: proba = y_prob
     except: proba = y_prob
     AP = average_precision_score(y_real, proba)
     AUC = roc_auc_score(y_real, proba)
-    print('Accuracy, weighted accuracy, precision, recall/SE, SP,     F1,     AUC,     MCC,     AP')
-    if MCC != 'N/A':
-        print("& %5.3f" % (ACCURACY), " &%7.3f" % (weighted_accuracy), " &%15.3f" % (precision),
-      " &%10.3f" % (SE), " &%5.3f" % (SP), " &%5.3f" % (F1), "&%5.3f" % (AUC),
-      "&%8.3f" % (MCC), "&%8.3f" % (AP))
-    else:
-        print("& %5.3f" % (ACCURACY), " &%7.3f" % (weighted_accuracy), " &%15.3f" % (precision),
-      " &%10.3f" % (SE), " &%5.3f" % (SP), " &%5.3f" % (F1), "&%5.3f" % (AUC), "& ",
-        MCC, "&%8.3f" % (AP))
+    print(f'Accuracy, weighted accuracy, precision, recall/SE, SP,     ',
+          f'F1,     AUC,     MCC,     AP')
+    # if MCC != 'N/A':
+    print("& %5.3f"%(ACCURACY), " &%7.3f"%(weighted_accuracy), 
+          " &%15.3f"%(precision), " &%10.3f"%(SE), " &%5.3f"%(SP), 
+    " &%5.3f"%(F1), "&%5.3f"%(AUC), "&%8.3f"%(MCC), "&%8.3f"%(AP))
+    # else:
+    #     print("& %5.3f" % (ACCURACY), " &%7.3f" % (weighted_accuracy), " &%15.3f" % (precision),
+    #   " &%10.3f" % (SE), " &%5.3f" % (SP), " &%5.3f" % (F1), "&%5.3f" % (AUC), "& ",
+    #     MCC, "&%8.3f" % (AP))
 
     # for i in evaluate_names:
     #     evaluator=Evaluator(name=i)
     #     score = evaluator(y_real, proba)
     #     print(f'{i}: {score:.3f}')
-    return ACCURACY, weighted_accuracy, precision, SE, SP, F1, AUC, MCC, AP
+    return [ACCURACY, weighted_accuracy, precision, SE, SP, F1, AUC, MCC, AP]
 
 
 def reg_evaluate(label_clean, preds_clean):
@@ -77,9 +82,8 @@ def reg_evaluate(label_clean, preds_clean):
     print('  MAE     MSE     RMSE    R2')
     print("&%5.3f" % (mae), " &%5.3f" % (mse), " &%5.3f" % (rmse),
       " &%5.3f" % (r2))
-    return r2, mae, rmse
-
-
+    # return r2, mae, rmse
+    return mae, mse, rmse, r2
 
 
 def eval_dict(y_probs:dict, y_label:dict, names:list, IS_R, draw_fig=False,
@@ -96,31 +100,30 @@ def eval_dict(y_probs:dict, y_label:dict, names:list, IS_R, draw_fig=False,
         # IS_R = task_list[i]
         print('*'*15, name, '*'*15)
         # print('Regression task', IS_R)
-
+        # print(y_probs)
         probs = y_probs[name]
         label = y_label[name]
         assert len(probs) == len(label)
         if IS_R == False: # classification task
             preds = get_preds(0.5, probs)
             cls_results = evaluate(label, preds, probs)
-            performances[name] = cls_results[0] # append accuracy
+            # performances[name] = float(cls_results[0]) # accuracy 
+            performances[name] = [float(r) for r in cls_results]
+
         else: # regression task
-            r2, mae, rmse = reg_evaluate(label, probs)
-            performances[name] = r2
+            mae, mse, rmse, r2 = reg_evaluate(label, probs)
+            # performances[name] = float(r2) # r2 
+            performances[name]=[float(mae), float(mse), float(rmse), float(r2)]
             if draw_fig:
-                color = mcp.gen_color_normalized(cmap='viridis',
-                                                data_arr=label)
+                color = mcp.gen_color_normalized(cmap='viridis', data_arr=label)
                 plt.scatter(label, probs, cmap='viridis', marker='.',
                             s=10, alpha=0.5, edgecolors='none', c=color)
-                plt.xlabel(f'True {name}')
-                plt.ylabel(f'Predicted {name}')
+                plt.xlabel(f'True {name}'); plt.ylabel(f'Predicted {name}')
                 if fig_title == None: title = f'{name} prediction on test set'
                 else: title = f'{name} {fig_title}'
                 plt.title(title)
-                x0, xmax = plt.xlim()
-                y0, ymax = plt.ylim()
-                data_width = xmax - x0
-                data_height = ymax - y0
+                x0, xmax = plt.xlim();  y0, ymax = plt.ylim()
+                data_width = xmax - x0; data_height = ymax - y0
                 # print(x0, xmax, y0, ymax, data_width, data_height)
                 r2   = f'R2:     {r2:.3f}'
                 mae  = f'MAE:   {mae:.3f}'
@@ -128,14 +131,12 @@ def eval_dict(y_probs:dict, y_label:dict, names:list, IS_R, draw_fig=False,
                 plt.text(x0 + 0.1*data_width, y0 + data_height * 0.8/0.95, r2)
                 plt.text(x0 + 0.1*data_width, y0 + data_height * 0.8,  mae)
                 plt.text(x0 + 0.1*data_width, y0 + data_height * 0.8*0.95, rmse)
-                if fig_path != None: 
-                    make_path(fig_path, False)
-                    plt.savefig(f'{fig_path}/{title}.png', format='png',
-                                transparent=False)
-                plt.show()
-                plt.cla()
-                plt.clf()
-                plt.close()
+                if fig_path != None: # save figure at fig_path
+                    make_path(fig_path, False); 
+                    fig_name = f'{fig_path}/{title}.png'
+                    plt.savefig(fig_name, format='png', transparent=False)
+
+                plt.show(); plt.cla(); plt.clf(); plt.close()
         print()
     return performances
 

@@ -4,6 +4,20 @@ import torch.nn.functional as F
 import os
 # print(os.getcwd()) 
 from scripts.get_vocab import get_c2i_i2c
+import time
+import pandas as pd
+import dgl
+from torch.utils.data import DataLoader
+from dgllife.model import model_zoo, load_pretrained
+from dgllife.utils import smiles_to_bigraph, EarlyStopping, Meter
+from dgllife.utils import PretrainAtomFeaturizer, PretrainBondFeaturizer
+from dgllife.utils import AttentiveFPAtomFeaturizer, AttentiveFPBondFeaturizer
+from dgllife.data import MoleculeCSVDataset
+from dgllife.model.gnn import AttentiveFPGNN
+from dgllife.model.readout import AttentiveFPReadout
+from dgl.nn.pytorch.glob import AvgPooling
+from torch.utils.data import Dataset, DataLoader
+from functools import partial
 
 class Classifier(nn.Module):
     def __init__(self, **config):
@@ -25,20 +39,6 @@ class Classifier(nn.Module):
 
     def get_dim(self): return self.dims
 
-import time
-import pandas as pd
-import dgl
-import torch
-import torch.nn as nn
-from torch.utils.data import DataLoader
-from dgllife.model import model_zoo
-from dgllife.utils import smiles_to_bigraph
-from dgllife.utils import EarlyStopping, Meter
-from dgllife.utils import AttentiveFPAtomFeaturizer
-from dgllife.utils import AttentiveFPBondFeaturizer
-from dgllife.data import MoleculeCSVDataset
-from dgllife.model.gnn import AttentiveFPGNN
-from dgllife.model.readout import AttentiveFPReadout
 
 def get_model_AT_10_17(names, n_layers, graph_feat_size, num_timesteps, dropout):
     atom_featurizer = AttentiveFPAtomFeaturizer(atom_data_field='hv')
@@ -55,17 +55,10 @@ def get_model_AT_10_17(names, n_layers, graph_feat_size, num_timesteps, dropout)
 
 def AttentiveFP(**config):
     return get_model_AT_10_17(config['prop_names'], config['n_layers'],
-            config['graph_feat_size'], config['num_timesteps'], config['dropout'])
+    config['graph_feat_size'], config['num_timesteps'], config['dropout'])
+
 
 # https://lifesci.dgl.ai/_modules/dgllife/model/pretrain.html
-from dgllife.model import load_pretrained
-from dgl.nn.pytorch.glob import AvgPooling
-import torch.nn as nn
-from torch.utils.data import Dataset, DataLoader
-from functools import partial
-import torch
-from dgllife.utils import smiles_to_bigraph, PretrainAtomFeaturizer, PretrainBondFeaturizer
-
 class GIN_MOD(nn.Module):
     """
     Reference: https://github.com/kexinhuang12345/DeepPurpose/blob/master/DeepPurpose/encoders.py#L392
@@ -93,13 +86,10 @@ class GIN_MOD(nn.Module):
     def forward(self, bg):
         # bg = bg.to(device)
         node_feats = [
-            bg.ndata.pop('atomic_number'),
-            bg.ndata.pop('chirality_type')
-        ]
+            bg.ndata.pop('atomic_number'), bg.ndata.pop('chirality_type')]
         edge_feats = [
-            bg.edata.pop('bond_type'),
-            bg.edata.pop('bond_direction_type')
-        ]
+            bg.edata.pop('bond_type'), bg.edata.pop('bond_direction_type')]
+
         node_feats = self.gnn(bg, node_feats, edge_feats)
         x = self.readout(bg, node_feats)
         x = self.transform(x)
@@ -122,9 +112,9 @@ class RNN(nn.Module):
         self.x_emb = nn.Embedding(n_vocab, n_vocab, self.c2i['<pad>'])
         self.x_emb.weight.data.copy_(torch.eye(n_vocab).to(self.device))
         
-        self.gru = nn.GRU(n_vocab, self.GRU_dim, num_layers = self.num_layers,
-                          batch_first = True, dropout = config['dropout'],
-                          bidirectional = self.bidir)
+        self.gru = nn.GRU(n_vocab, self.GRU_dim, num_layers=self.num_layers,
+          batch_first=True, dropout=config['dropout'], bidirectional=self.bidir)
+        
         self.hid_dim = self.GRU_dim * (2 if self.bidir else 1)
         self.fc = nn.Linear(self.hid_dim, self.GRU_dim)
         self.final = nn.Linear(self.GRU_dim, config['out_dim'])

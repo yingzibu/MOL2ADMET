@@ -10,17 +10,55 @@ import dgl
 import torch
 import torch.nn as nn
 from dgllife.model import model_zoo
-from dgllife.utils import smiles_to_bigraph
-from dgllife.utils import EarlyStopping, Meter
+from dgllife.utils import smiles_to_bigraph, EarlyStopping, Meter
 from dgllife.utils import AttentiveFPAtomFeaturizer
 from dgllife.utils import AttentiveFPBondFeaturizer
+from dgllife.utils import PretrainAtomFeaturizer, PretrainBondFeaturizer
 from dgllife.data import MoleculeCSVDataset
 from dgllife.model.gnn import AttentiveFPGNN
 from dgllife.model.readout import AttentiveFPReadout
 from torch.nn.utils.rnn import pack_sequence, pad_sequence
 from torch.utils.data import DataLoader, Dataset
 from scripts.get_vocab import get_c2i_i2c, string2tensor
+from dgllife.model import load_pretrained
+from dgl.nn.pytorch.glob import AvgPooling
+from functools import partial
 
+
+def get_loader(df, names, params, model_type, vocab=None):
+    print('--> preparing data loader for model type ', model_type)
+    if model_type == 'MLP': return DataLoader(nn_dataset(df, names), **params)
+    elif model_type == 'AttentiveFP':
+        return get_AttentiveFP_loader(df, names, **params)
+
+    elif model_type == 'GIN': 
+        return get_GIN_dataloader(GIN_dataset(df, names), **params)
+
+    elif model_type == 'RNN': 
+        return get_rnn_loader(df, names, vocab, **params)
+
+def get_multi_loader(trains, valids, tests, config):
+    names = config['prop_names']
+    vocab = None if 'vocab' not in config else config['vocab']
+    batch_size = config['batch_size']
+    model_type = config['model_type']
+
+    print('---> loader for', names)
+    params_ = {'batch_size': batch_size, 'shuffle': True,
+               'drop_last': False, 'num_workers': 0}
+    param_t = {'batch_size': batch_size, 'shuffle': False,
+               'drop_last': False, 'num_workers': 0}
+
+    # NEED TO CHANGE HERE TO INCLUDE SELFIES
+    if model_type == 'RNN'and vocab == None:
+        df = pd.concat([trains, valids, tests], ignore_index=True, axis=0)
+        vocab = get_vocab(df)
+    train_loader = get_loader(trains, names, params_, model_type, vocab)
+    valid_loader = get_loader(valids, names, params_, model_type, vocab)
+    test_loader  = get_loader(tests,  names, param_t, model_type, vocab)
+    return train_loader, valid_loader, test_loader, vocab
+
+"""dataset for MLP"""
 m = Chem.MolFromSmiles
 header = ['bit' + str(i) for i in range(167)]
 MASK = -100
@@ -40,8 +78,6 @@ def process(data_):
     data[header] = pd.DataFrame(MACCS_list)
     print('---> FINISHED')
     return data
-
-
 
 class nn_dataset(Dataset):
     def __init__(self, df, prop_names, mask=MASK):
@@ -63,9 +99,8 @@ class nn_dataset(Dataset):
 
     def get_df(self): return self.df
 
+
 """Dataset and dataloader for Attentive FP"""
-
-
 def collate_molgraphs(data):
     assert len(data[0]) in [3, 4], \
         'Expect the tuple to be of length 3 or 4, got {:d}'.format(len(data[0]))
@@ -109,17 +144,6 @@ def get_AttentiveFP_loader(df, name, **loader_params):
 
 
 """Dataset and dataloader for GIN pretrained model"""
-
-from dgllife.model import load_pretrained
-from dgl.nn.pytorch.glob import AvgPooling
-import torch.nn as nn
-from torch.utils.data import Dataset, DataLoader
-from functools import partial
-import torch
-from dgllife.utils import smiles_to_bigraph, PretrainAtomFeaturizer, PretrainBondFeaturizer
-
-MASK = -100
-
 class GIN_dataset(Dataset):
     def __init__(self, df, names, mask=MASK):
         df = df.fillna(mask)
@@ -138,7 +162,6 @@ class GIN_dataset(Dataset):
         label = torch.tensor(self.props.iloc[idx], dtype=torch.float32)
         return v_d, label
 
-import dgl
 def get_GIN_dataloader(datasets, **loader_params):
     def dgl_collate_func(data):
         x, labels = map(list, zip(*data))
@@ -150,9 +173,8 @@ def get_GIN_dataloader(datasets, **loader_params):
     loader_params['collate_fn'] = dgl_collate_func
     return DataLoader(datasets, **loader_params)
 
+
 """Dataset and loader for RNN"""
-
-
 class rnn_dataset(Dataset):
     def __init__(self, df, prop_names, vocab, device='cpu', mask=MASK):
         super(rnn_dataset, self).__init__()
@@ -173,14 +195,14 @@ class rnn_dataset(Dataset):
     
     def __len__(self): return self.len
 
-
 def get_rnn_loader(train, names, vocab, **loader_params):
     df = train.copy()
     dataset = rnn_dataset(df, names, vocab)
     c2i, _ =  get_c2i_i2c(vocab)
     def my_collate(batch):
         data = [item[0] for item in batch]
-        data = pad_sequence(data, batch_first=True, padding_value=c2i['<pad>'])
+        data = pad_sequence(data, batch_first=True, 
+                        padding_value=c2i['<pad>'])
         targets = [item[1] for item in batch]
         targets = torch.stack(targets)
         return (data, targets)

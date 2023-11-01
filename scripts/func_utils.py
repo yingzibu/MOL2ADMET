@@ -1,15 +1,17 @@
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 import pandas as pd
+
+from tdc import Oracle
+qed = Oracle(name='QED')
+sa = Oracle(name='SA')
+
 def make_path(path_name, verbose=True):
     import os
     if os.path.exists(path_name):
         if verbose: print('path:', path_name, 'already exists')
     else: os.makedirs(path_name); print('path:', path_name, 'is created')
 
-from tdc import Oracle
-qed = Oracle(name='QED')
-sa = Oracle(name='SA')
 def convert_with_qed_sa(train):
     smi_list = train['smiles'].tolist()
     smile_list = []
@@ -18,8 +20,7 @@ def convert_with_qed_sa(train):
     for i, smi in tqdm(enumerate(smi_list), total=len(smi_list),
                        desc='cal QED/SA, delete invalid'):
         try:
-            qed_ = qed(smi)
-            sa_ = sa(smi)
+            qed_ = qed(smi); sa_ = sa(smi)
             smile_list.append(smi)
             qed_list.append(qed_)
             sa_list.append(sa_)
@@ -33,12 +34,9 @@ def convert_with_qed_sa(train):
 
 def get_min(d:dict):
     min_key = next(iter(d))
-
-    # Iterate over the keys in the dictionary
-    for key in d:
+    for key in d: # Iterate over the keys in the dictionary
         # If the value of the current key > the value of max_key, update max_key
-        if d[key] < d[min_key]:
-            min_key = key
+        if d[key] < d[min_key]: min_key = key
     return min_key, d[min_key]
 
 def plot_loss(train_dict, test_dict, name='test', title_name=None):
@@ -54,7 +52,8 @@ def plot_loss(train_dict, test_dict, name='test', title_name=None):
     plt.legend()
     plt.show()
 
-def plot_performance(list_of_dict, model_types, title=None): # loss dict or performance dict
+def plot_performance(list_of_dict, model_types, title=None): 
+    # loss dict or performance dict
     assert len(list_of_dict) == len(model_types)
     fig = plt.figure()
     for model_name, per in zip(model_types, list_of_dict):

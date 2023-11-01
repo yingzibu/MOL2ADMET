@@ -20,25 +20,20 @@ model_types = ['MLP', 'AttentiveFP', 'GIN', 'RNN']
 def count_bool(lst): return sum(lst)
 
 class MTLoss(Module): # calculate multitask loss with trainable parameters
-    def __init__(self, task_num, weight_loss=None, device='cuda'): 
+    def __init__(self, task_num, weight_loss=None): 
         super(MTLoss, self).__init__()
         self.task_num = task_num
-        self.device = device
         if weight_loss==None: weight_loss = [1.0] * self.task_num
-        # eta = log sigma^2
-        self.eta = nn.Parameter(torch.tensor(weight_loss, device=self.device))
+        self.eta = nn.Parameter(torch.Tensor(weight_loss)) # eta = log sigma^2
         
     def forward(self, loss_list, IS_R=None):
         assert len(loss_list) == self.task_num
         # assert len(loss_list) == len(IS_R)
         # reg_num = count_bool(IS_R) # the number of regression tasks
         # cls_num = len(IS_R) - reg_num  # the number of cls tasks
-        loss_list = torch.Tensor(loss_list).to(self.device)
-        total_loss = loss_list * torch.exp(-self.eta) + self.eta
+        total_loss = torch.stack(loss_list) * torch.exp(-self.eta) + self.eta
         # return updated weight \
         weight_loss = [float(self.eta[i].item()) for i in range(self.task_num)]
-        weight_loss = [np.exp(-1.0 * i) for i in weight_loss]
-        weight_loss = [i/sum(weight_loss) for i in weight_loss]
         return total_loss.sum(), weight_loss
 
 
@@ -59,9 +54,28 @@ def get_train_fn(model_type):
     if model_type in model_types: return train_epoch_MLP
     else: pass
 
+
 def get_eval_fn(model_type):
     if model_type in model_types: return train_epoch_MLP
     else: pass
+    # elif model_type == 'GIN': return train_epoch_MLP
+    # elif model_type == 'AttentiveFP': return train_epoch_MLP
+    # elif model_type == 'RNN': return train_epoch_MLP
+
+
+# def get_loader(df, names, params, model_type, vocab=None):
+#     print('--> preparing data loader for model type ', model_type)
+#     if model_type == 'MLP': return DataLoader(nn_dataset(df, names), **params)
+#     elif model_type == 'AttentiveFP':
+#         return get_AttentiveFP_loader(df, names, **params)
+
+#     elif model_type == 'GIN': 
+#         return get_GIN_dataloader(GIN_dataset(df, names), **params)
+
+#     elif model_type == 'RNN': 
+#         return get_rnn_loader(df, names, vocab, **params)
+
+
 
 def train_epoch_MLP(model, loader, IS_R, names, device,
                     epoch=None, optimizer=None, MASK=-100,
@@ -81,8 +95,10 @@ def train_epoch_MLP(model, loader, IS_R, names, device,
 
     if weight_loss == None: weight_loss = [1]*len(names)
 
-    total_loss, losses_list, y_probs, y_label = 0, [], {}, {}
-
+    losses, y_probs, y_label = 0, {}, {}
+    # y_probs = {}
+    # y_label = {}
+    losses_list = []
     for idx, batch_data in enumerate(loader):
         """
         len(batch_data) could determine which algorithm
@@ -104,22 +120,20 @@ def train_epoch_MLP(model, loader, IS_R, names, device,
         
         batch_loss_list = []
         for j, (name, IS_R, w) in enumerate(zip(names, IS_R_list, weight_loss)):
-
             loss_func = get_loss_fn(IS_R)
             probs = pred[:, j][~mask[:, j]]
             label = labels[:, j][~mask[:, j]]
-            
-            len_here = label.shape[0] # num of data with labels
-            loss_here = loss_func(probs, label) 
-            
-            if len_here != 0:
-                loss_here /= len_here
-                batch_loss_list.append(loss_here.item())
-            else:
-                batch_loss_list.append(float(0))
-            
-            if j == 0: loss  = loss_here * w
-            else:      loss += loss_here * w
+
+            loss_here = loss_func(probs, label) * w
+            batch_loss_list.append(loss_here)
+
+
+            print()
+            if j == 0: loss  = loss_here; print(loss.item(), sum(batch_loss_list).item())
+            else:      loss += loss_here; print(loss.item(), sum(batch_loss_list).item())
+
+            # if j == 0: loss  = loss_func(probs, label) * w  # start jth task 
+            # else:      loss += loss_func(probs, label) * w
             
             if IS_R == False: probs = F.sigmoid(probs)
 
@@ -134,24 +148,29 @@ def train_epoch_MLP(model, loader, IS_R, names, device,
                         del_here = max_here - min_here
                         label = [l * del_here + min_here for l in label]
                         probs = [p * del_here + min_here for p in probs]
+                    # else: # did not scale the name, no info in scale_dict 
+                    #     min_here, del_here = 0, 1
                     
                 if idx ==0: y_probs[name], y_label[name] = probs, label
                 else:
                     y_probs[name] += probs
                     y_label[name] += label
 
-        
+        assert len(batch_loss_list) == len(names)
+        try: 
+            assert loss == sum(batch_loss_list)
+        except: 
+            print('loss is not the same as batch_loss_list', loss, sum(batch_loss_list))
         if len(losses_list) == 0: losses_list = batch_loss_list
         else: losses_list = [i+j for i, j in zip(losses_list, batch_loss_list)]
 
-        total_loss += loss.item()
+        losses += loss.item()
         if optimizer != None:
             optimizer.zero_grad(); loss.backward(); optimizer.step()
 
-    
+    total_loss = losses / len(loader.dataset)
     if epoch != None: # train or valid
         if ver: print(f'Epoch:{epoch}, [{train_type}] Loss: {total_loss:.3f}')
-    
     elif epoch == None: # test
         print(f'[{train_type}] Loss: {total_loss:.3f}')
         performance = eval_dict(y_probs,y_label,names,IS_R_list,draw_fig=True)
@@ -278,7 +297,6 @@ class PRED:
         if ver:
             # print(f'Train time: {np.mean(self.times_list):.5f}'
             #       f'+/-{np.std(self.times_list):.5f} ms')
-            if self.weight_loss != None: print('task weight: ',self.weight_loss)
             print('Model parameters: ', count_parameters(self.model))
             self.get_runtime()
             print(f"best epoch: {self.best_epoch}, min loss: {self.min_loss:.4f}")
@@ -299,9 +317,8 @@ class PRED:
         else:          MAX_EPOCH = self.config['MAX_EPOCH']
         if len(self.prop_names) == 1: uw = False # single task, no need uncertainty weight
         if self.uw: 
-            m_w = MTLoss(len(self.prop_names), device=self.device) 
-            optimizer = torch.optim.SGD(m_w.parameters(), lr=0.1); m_w.train()
-    
+            m_w = MTLoss(len(self.prop_names), self.weight_loss).to(self.device)
+            optimizer = nn.optim.SGD(m_w.parameters(), lr=0.1); m_w.train()
         for epoch in range(self.best_epoch, MAX_EPOCH):
             t = time.time()
             score, l, r  = self.train_fn(self.model, data_loader, self.IS_R,
@@ -310,7 +327,6 @@ class PRED:
                                   weight_loss=self.weight_loss)
             train_time = (time.time() - t) * 1000 / len(data_loader.dataset)
             self.times_list.append(train_time)
-            # print(l)
             if self.uw: # uncertainty weight
                 optimizer.zero_grad()
                 total_loss, self.weight_loss = m_w(l, r)
@@ -318,7 +334,7 @@ class PRED:
             val_score, probs, labels = self.train_fn(self.model,  val_loader,
                                        self.IS_R,self.prop_names,self.device,
                                        epoch,   scale_dict = self.scale_dict,
-                                       weight_loss=self.weight_loss) # do not use weight loss for val?  
+                                       weight_loss=self.weight_loss)
             self.train_dict[epoch] = score
             self.valid_dict[epoch] = val_score
             print(f'Epoch:{epoch} [Train] Loss: {score:.3f} |',
@@ -332,10 +348,6 @@ class PRED:
 
             if epoch % self.verbose_freq == 0 and epoch != 0:
                 self.get_runtime()
-                if self.uw: 
-                    print('different task weight', 
-                        ['{:.3f}'.format(i) for i in self.weight_loss])
-                
                 plot_loss(self.train_dict, self.valid_dict, name='valid',
                     title_name= f'loss during training {self.model_type}')
                 eval_dict(probs, labels, self.prop_names, IS_R=self.IS_R)
@@ -344,8 +356,6 @@ class PRED:
         self.save_train_status()
         # print(f'Train time: {np.mean(self.times_list):.5f}'
         #       f'+/-{np.std(self.times_list):.5f} ms')
-        print('task weight', 
-                        ['{:.3f}'.format(i) for i in self.weight_loss])
         print('Model parameters: ', count_parameters(self.model))
         self.get_runtime()
         print(f"best epoch: {self.best_epoch}, min loss: {self.min_loss:.4f}")
