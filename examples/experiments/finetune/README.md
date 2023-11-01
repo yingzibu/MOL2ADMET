@@ -15,10 +15,14 @@
 
 ### Ongoing work
 
-https://colab.research.google.com/drive/1pYgrZ8beRZtljh3M9q6KpeId8itfGuRl#scrollTo=q4I-e9vbUbUJ&uniqifier=1
 
 * VAE implementation
 * write introduction
+
+
+## Loss drop during training, single task
+
+https://colab.research.google.com/drive/1pYgrZ8beRZtljh3M9q6KpeId8itfGuRl#scrollTo=q4I-e9vbUbUJ&uniqifier=1
 
 ···
 	
@@ -68,7 +72,7 @@ https://colab.research.google.com/drive/1pYgrZ8beRZtljh3M9q6KpeId8itfGuRl#scroll
 	plot_performance(train_dict_list, model_types, title=f'Train loss during training on {name} classification (ST)')
 
 ···
-## Loss drop during training, single task
+
 
 | task type | train | valid
 :-----:|:-------------------------:|:--------------------: 
