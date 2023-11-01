@@ -17,7 +17,27 @@
 * VAE implementation
 * write introduction
 
-
+···
+	name = 'Lipophilicity_AstraZeneca'
+	results_dict = {
+	    'MLP':['scale', 6], 
+	    'AttentiveFP': ['scale', 1],
+	    'GIN': ['scale', 7],
+	    'RNN': ['scale', 2]
+	}
+	
+	valid_dict_list, train_dict_list = [], []
+	for model_type in model_types:
+	    l = results_dict[model_type]
+	    f = f'{name}_{l[0]}/{model_type}_ST_{l[1]}.yml'
+	    with open(f, 'r') as d: data = yaml.safe_load(d)
+	    valid_dict_list.append(data['valid_dict'])
+	    train_dict_list.append(data['train_dict'])
+	assert len(valid_dict_list) == len(model_types)
+	from scripts.func_utils import *
+	plot_performance(valid_dict_list, model_types, title=f'Valid loss during training on {name} regression (ST)')
+	plot_performance(train_dict_list, model_types, title=f'Train loss during training on {name} regression (ST)')
+···
 ## Loss drop during training, single task
 
 | task type | train | valid
