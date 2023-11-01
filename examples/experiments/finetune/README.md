@@ -74,10 +74,10 @@ https://colab.research.google.com/drive/1pYgrZ8beRZtljh3M9q6KpeId8itfGuRl#scroll
 ···
 
 
-| task type | train | valid
-:-----:|:-------------------------:|:--------------------: 
-|regression example| ![](train_lipo_st.png)| ![](valid_lipo_st.png) |   
-| classification example | ![](cyp2d6_train.png)  | ![](cyp2d6_valid.png)   
+| task type | data distribution| train | valid
+:-----:|:-------------------------:|:--------------------:|:--------------------:  
+|regression example|  ![](lipo_data.png)| ![](train_lipo_st.png)| ![](valid_lipo_st.png) |   
+| classification example | ![](cyp2d6_data.png) |  ![](cyp2d6_train.png)  | ![](cyp2d6_valid.png)   
 
 
 ## Scale affects regression? 
