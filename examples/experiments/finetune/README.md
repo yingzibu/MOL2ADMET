@@ -79,6 +79,23 @@ https://colab.research.google.com/drive/1pYgrZ8beRZtljh3M9q6KpeId8itfGuRl#scroll
 |regression example|  ![](lipo_data.png)| ![](train_lipo_st.png)| ![](valid_lipo_st.png) |   
 | classification example | ![](cyp2d6_data.png) |  ![](cyp2d6_train.png)  | ![](cyp2d6_valid.png)   
 
+******************** Lipophilicity_AstraZeneca ******************** 
+
+
+| lipo	|  mae  |  mse  |  rmse  |  r2  
+:-----:|:---:|:-----:|:----:|:----:  
+MLP |0.652   |0.707   |0.841   |0.521   
+AFP |0.353   |0.239   |0.489   |0.834   
+GIN |0.489   |0.419   |0.647   |0.717   
+RNN |0.614   |0.667   |0.817   |0.549   
+
+cyp2d6 |  acc  |  w_acc  |  prec  |  recall  |  sp  |  f1  |  auc  |  mcc  |  ap  
+:-----:|:---:|:-----:|:----:|:----:|:-----:|:---:|:-----:|:----:|:----:    
+MLP |0.857   |0.717   |0.653   |0.494   |0.940   |0.562   |0.836   |0.486   |0.634  
+AFP |0.883   |0.746   |0.772   |0.527   |0.964   |0.626   |0.870   |0.574   |0.712   
+GIN |0.892   |0.786   |0.758   |0.617   |0.955   |0.680   |0.907   |0.621   |0.764   
+RNN |0.848   |0.672   |0.650   |0.391   |0.952   |0.488   |0.803   |0.423   |0.555   
+
 
 ## Scale affects regression? 
 
