@@ -1,6 +1,6 @@
 
 #### RNN VAE latent space
-Reference: Gómez-Bombarelli, Rafael, et al. "Automatic chemical design using a data-driven continuous representation of molecules." ACS central science 4.2 (2018): 268-276.
+
  
  | PCA | latent space QED    | latent space SA
 :-----:|:-------------------------:|:-------------------------:
@@ -10,11 +10,11 @@ Reference: Gómez-Bombarelli, Rafael, et al. "Automatic chemical design using a 
 
 
 
- | dim reduction | latent space QED PCA   | latent space SA PCA  
+ | PCA | latent space QED  | latent space SA 
  :-----:|:-------------------------:|:-------------------------: 
  | before train |  ![](figures/qed_0.png)  |  ![](figures/sa_0.png)  
  | train 1 epoch (batch update > 100 times) |  ![](figures/qed_1.png)  |  ![](figures/sa_1.png)  
-
+ | train 29 epoch|  ![](figures/fig_11_09_qed.png)  |  ![](figures/fig_11_09_sa.png)  
 
 
 
@@ -98,3 +98,4 @@ train: 6988 | valid: 998 | test: 1996 | total: 9982
 *************** LD50_Zhu ***************
 train: 5170 | valid: 738 | test: 1477 | total: 7385
 ```
+Reference: Gómez-Bombarelli, Rafael, et al. "Automatic chemical design using a data-driven continuous representation of molecules." ACS central science 4.2 (2018): 268-276.
