@@ -14,7 +14,7 @@
  :-----:|:-------------------------:|:-------------------------: 
  | before train |  ![](figures/qed_0.png)  |  ![](figures/sa_0.png)  
  | train 1 epoch (batch update > 100 times) |  ![](figures/qed_1.png)  |  ![](figures/sa_1.png)  
- | train 29 epoch|  ![](figures/fig_11_09_qed.png)  |  ![](figures/fig_11_09_sa.png)  
+ | train 29 epoch |  ![](figures/fig_11_09_qed.png)  |  ![](figures/fig_11_09_sa.png) |  
 
 
 
