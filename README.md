@@ -4,8 +4,8 @@
  
  | PCA | latent space QED    | latent space SA
 :-----:|:-------------------------:|:-------------------------:
-|with classifier| ![](figures/fig_11_09_qed.gif)  | ![](figures/fig_11_09_sa.gif) |
-| prediction | ![](figures/qed_pred.png) | ![](figures/sa_pred.png) |
+|with classifier| ![](figures/fig_11_09_qed.gif)  | ![](figures/fig_11_09_sa.gif) 
+| prediction | ![](figures/qed_pred.png) | ![](figures/sa_pred.png) 
 
 
 
@@ -14,7 +14,11 @@
  :-----:|:-------------------------:|:-------------------------: 
  | before train |  ![](figures/qed_0.png)  |  ![](figures/sa_0.png)  
  | train 1 epoch (batch update > 100 times) |  ![](figures/qed_1.png)  |  ![](figures/sa_1.png)  
- | train 29 epoch |  ![](figures/fig_11_09_qed.png)  |  ![](figures/fig_11_09_sa.png) |  
+ | train 29 epoch |  ![](figures/fig_11_09_qed.png)  |  ![](figures/fig_11_09_sa.png) 
+
+
+
+ 
 
 
 
