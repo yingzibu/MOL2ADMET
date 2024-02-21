@@ -5,5 +5,5 @@ Clean Code: https://colab.research.google.com/drive/1ZzPBgAggmFLRFnkT_3SlD-GiUoA
 
 
 | REGRESSION    | CLASSIFICATION
-|:-------------------------:|:-------------------------:
+|:-------------------------------:|:-------------------------:
 | ![](reg_dis.png)  |![](cls_dis.png)
