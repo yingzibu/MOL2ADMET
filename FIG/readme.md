@@ -8,6 +8,8 @@ Clean Code: https://colab.research.google.com/drive/1ZzPBgAggmFLRFnkT_3SlD-GiUoA
 |:-------------------------------:|:-------------------------:
 | ![](reg_dis.png)  |![](cls_dis.png)
 
+![](cls_dis_ver2.png)
+
 
 M5 visualization: https://colab.research.google.com/drive/1WJ2gAmwLRKDBDa_q-b8DGhuNw-QmeSKo#scrollTo=oBTo9h6_xHRL
 
