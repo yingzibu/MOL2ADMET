@@ -4,12 +4,12 @@ Original Messy Code: https://colab.research.google.com/drive/11z-T_rD6m7rcevHlvG
 Clean Code: https://colab.research.google.com/drive/1ZzPBgAggmFLRFnkT_3SlD-GiUoA2EawZ#scrollTo=-MdQWjdEvJcA
 
 
-| REGRESSION    | CLASSIFICATION
+| REGRESSION    | CLASSIFICATION 
 |:-------------------------------:|:-------------------------:
 | ![](reg_dis.png)  |![](cls_dis.png)
 
 ![](cls_dis_ver2.png)
-
+![Other regression tasks with labels of really large range](reg_dis_others.png)
 
 M5 visualization: https://colab.research.google.com/drive/1WJ2gAmwLRKDBDa_q-b8DGhuNw-QmeSKo#scrollTo=oBTo9h6_xHRL
 
