@@ -7,6 +7,23 @@ Code: https://colab.research.google.com/drive/1WQzKw1zBqExVUyZvg8QsWJ4cJmJFL__U#
 Random Forest Evaluation: 
 
 
+name |  	       mae      |       rmse      |       r2      |       spearman      
+---|---|---|---|--- 
+Caco2_Wang  |0.340&plusmn;0.001  |0.447&plusmn;0.001  |0.686&plusmn;0.002  |0.796&plusmn;0.001  
+Lipophilicity_AstraZeneca |0.632&plusmn;0.001  |0.824&plusmn;0.001  |0.541&plusmn;0.001  |0.705&plusmn;0.001  
+HydrationFreeEnergy_FreeSolv|0.724&plusmn;0.003  |1.271&plusmn;0.005  |0.901&plusmn;0.001  |0.970&plusmn;0.001  
+Solubility_AqSolDB |0.903&plusmn;0.001  |1.276&plusmn;0.001  |0.700&plusmn;0.000  |0.834&plusmn;0.000  
+LD50_Zhu	|0.426&plusmn;0.001  |0.581&plusmn;0.001  |0.623&plusmn;0.002  |0.746&plusmn;0.002 
+Kp 	|5.956&plusmn;0.115  |12.234&plusmn;0.088  |0.207&plusmn;0.011  |0.438&plusmn;0.016  
+Half_Life_Obach 	|29.358&plusmn;0.965  |105.727&plusmn;2.015  |0.220&plusmn;0.030  |0.326&plusmn;0.030  
+Clearance_Hepatocyte_AZ 	|35.924&plusmn;0.245  |48.224&plusmn;0.145  |0.068&plusmn;0.006  |0.396&plusmn;0.011  
+Clearance_Microsome_AZ 	|29.818&plusmn;0.205  |40.895&plusmn;0.290  |0.116&plusmn;0.013  |0.506&plusmn;0.015  
+PPBR_AZ 	|8.667&plusmn;0.039  |12.998&plusmn;0.043  |0.303&plusmn;0.005  |0.536&plusmn;0.001 
+VDss_Lombardo 	|3.132&plusmn;0.013  |5.643&plusmn;0.021  |0.318&plusmn;0.005  |0.570&plusmn;0.009 
+
+     
+
+
 name |       acc      |       auc      |       ap      
 ---|---|---|---  
 CYP2C19_Veith |0.780&plusmn;0.003  |0.854&plusmn;0.000  |0.808&plusmn;0.001
