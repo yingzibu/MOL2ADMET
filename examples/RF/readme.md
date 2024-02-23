@@ -8,7 +8,7 @@ Random Forest Evaluation:
 
 
 name |       acc      |       auc      |       ap      
----|---|---|---
+---|---|---|---  
 CYP2C19_Veith |0.780&plusmn;0.003  |0.854&plusmn;0.000  |0.808&plusmn;0.001
 CYP2D6_Veith |0.860&plusmn;0.001  |0.857&plusmn;0.001  |0.639&plusmn;0.000  
  CYP3A4_Veith  |0.767&plusmn;0.001  |0.849&plusmn;0.000  |0.790&plusmn;0.001  
