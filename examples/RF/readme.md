@@ -2,7 +2,9 @@ Code: https://colab.research.google.com/drive/1WQzKw1zBqExVUyZvg8QsWJ4cJmJFL__U#
 
  
 
-******************** CYP2C19_Veith ******************** 
+
+
+Random Forest Evaluation: 
 
 
 name |       acc      |       auc      |       ap      
